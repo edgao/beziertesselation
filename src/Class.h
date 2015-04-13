@@ -34,5 +34,6 @@ public:
 	vector<BezierPatch*> patches;
 	BezierPatchTesselator();
 	BezierPatchTesselator(vector<BezierPatch*>*);
-	vector<Triangle> tesselate(int mode, bool center_test);
+	vector<Triangle*>* tesselate(int mode, bool center_test);
+	vector<Triangle*>* tesselateTriangle(int mode, bool center_test, Vector2f vertices[]);
 };
