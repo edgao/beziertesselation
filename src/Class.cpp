@@ -48,13 +48,27 @@ BezierPatchTesselator::BezierPatchTesselator(vector<BezierPatch*>* p) {
 vector<Triangle*>* BezierPatchTesselator::tesselate(int mode, bool centerTest) {
 	vector<Triangle*>* triangles = (vector<Triangle*>*) malloc(sizeof(vector<Triangle*>));
 	for (int patchNum = 0; patchNum < patches.size(); patchNum++) {
-		// Split this patch into two triangles
-		// tesselate the two triangles
-		// append the results to our vector
+		Vector2f vertices[3];
+		vertices[0] = (Vector2f() << 0, 0).finished();
+		vertices[1] = (Vector2f() << 0, 1).finished();
+		vertices[2] = (Vector2f() << 1, 0).finished();
+		vector<Triangle*>* temp = tesselateTriangle(mode, center_test, vertices);
+		for (int i = 0; i < temp->length; i++) {
+			triangles->push_back((*temp)[i]);
+		}
+
+		vertices[0] = (Vector2f() << 1, 1).finished();
+		vertices[1] = (Vector2f() << 0, 1).finished();
+		vertices[2] = (Vector2f() << 1, 0).finished();
+		vector<Triangle*>* temp = tesselateTriangle(mode, center_test, vertices);
+		for (int i = 0; i < temp->length; i++) {
+			triangles->push_back((*temp)[i]);
+		}
 	}
 	return triangles;
 }
 
 vector<Triangle*>* BezierPatchTesselator::tesselateTriangle(int mode, bool center_test, Vector2f vertices[]) {
+
 	return NULL;
 }
