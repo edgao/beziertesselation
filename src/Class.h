@@ -18,13 +18,13 @@ public:
 	BezierPatch();
 	BezierPatch(BezierCurve[]);
 	Vector3f evaluate(Vector2f);
-	bool isFlat(Vector2f, Vector2f, float);
 };
 
 class Triangle {
 public:
 	Vector3f vertices[3];
 	Triangle();
+	Triangle(Vector3f, Vector3f, Vector3f);
 	Triangle(Vector3f[]);
 };
 
@@ -34,6 +34,7 @@ public:
 	vector<BezierPatch*> patches;
 	BezierPatchTesselator();
 	BezierPatchTesselator(vector<BezierPatch*>*);
-	vector<Triangle*>* tesselate(int mode, bool center_test);
-	vector<Triangle*>* tesselateTriangle(int mode, bool center_test, Vector2f vertices[]);
+	vector<Triangle*>* tesselate(int mode, bool center_test, float threshold);
+	vector<Triangle*>* tesselateTriangle(int mode, bool center_test, Vector2f vertices[], BezierPatch p, float threshold);
+	bool isFlat(BezierPatch, Vector2f, Vector3f, float);
 };
