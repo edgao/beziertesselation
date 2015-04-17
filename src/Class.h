@@ -23,9 +23,11 @@ public:
 class Triangle {
 public:
 	Vector3f vertices[3];
+	Vector3f normals[3];
 	Triangle();
-	Triangle(Vector3f, Vector3f, Vector3f);
-	Triangle(Vector3f[]);
+	Triangle(Vector3f, Vector3f, Vector3f, Vector3f, Vector3f, Vector3f);
+	Triangle(Vector3f[], Vector3f[]);
+	Vector3f getFlatNormal();
 };
 
 class BezierPatchTesselator {

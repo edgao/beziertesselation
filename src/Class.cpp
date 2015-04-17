@@ -32,15 +32,22 @@ Vector3f BezierPatch::evaluate(Vector2f u) {
 }
 
 Triangle::Triangle() {}
-Triangle::Triangle(Vector3f a, Vector3f b, Vector3f c) {
+Triangle::Triangle(Vector3f a, Vector3f b, Vector3f c, Vector3f n1, Vector3f n2, Vector3f n3) {
 	vertices[0] = a;
 	vertices[1] = b;
 	vertices[2] = c;
+	normals[0] = n1;
+	normals[1] = n2;
+	normals[2] = n3;
 }
-Triangle::Triangle(Vector3f v[]) {
+Triangle::Triangle(Vector3f v[], Vector3f n[]) {
 	for (int i = 0; i < 3; i++) {
 		vertices[i] = v[i];
+		normals[i] = n[i];
 	}
+}
+Vector3f Triangle::getFlatNormal() {
+	return (normals[0] + normals[1] + normals[2]) / 3.0;
 }
 
 BezierPatchTesselator::BezierPatchTesselator() {}
@@ -83,7 +90,8 @@ vector<Triangle*>* BezierPatchTesselator::tesselateTriangle(int mode, bool cente
 				Vector3f ref = p.evaluate(midpoint);
 				if (isFlat(p, midpoint, ref, threshold)) {
 					// If this side of the triangle is flat, make it a polygon
-					ret->push_back(new Triangle(p.evaluate(a), p.evaluate(b), p.evaluate(centerPoint)));
+					Vector3f norm = p.evaluate(a).cross(p.evaluate(b));
+					ret->push_back(new Triangle(p.evaluate(a), p.evaluate(b), p.evaluate(centerPoint), norm, norm, norm));
 				} else {
 					// Otherwise, subdivide and recurse
 					Vector2f newVertices[3];
@@ -117,6 +125,20 @@ vector<Triangle*>* BezierPatchTesselator::tesselateTriangle(int mode, bool cente
 	}
 	if (nonflat[2]) {
 		// All sides are nonflat, subdivide into 4 triangles
+		// Handle the three corners
+		for (int side = 0; side < 3; side++) {
+			Vector2f newVertices[3];
+			newVertices[0] = vertices[side];
+			newVertices[1] = (vertices[(side + 1) % 3] + vertices[side]) / 2;
+			newVertices[1] = (vertices[(side + 2) % 3] + vertices[side]) / 2;
+			append(ret, tesselateTriangle(mode, center_test, newVertices, p, threshold));
+		}
+		// Handle the middle triangle
+		Vector2f newVertices[3];
+		for (int side = 0; side < 3; side++) {
+			newVertices[side] = (vertices[side] + vertices[(side + 1) % 3]) / 2;
+		}
+		append(ret, tesselateTriangle(mode, center_test, newVertices, p, threshold));
 	} else if (nonflat[0]) {
 		if (nonflat[1]) {
 			// One side is flat; 3 sub-triangles 
@@ -129,10 +151,10 @@ vector<Triangle*>* BezierPatchTesselator::tesselateTriangle(int mode, bool cente
 			Vector2f newVertices[3];
 			newVertices[0] = a;
 			newVertices[1] = midpoint;
-			newVertices[2] = centerpoint;
+			newVertices[2] = centerPoint;
 			append(ret, tesselateTriangle(mode, center_test, newVertices, p, threshold));
 
-			a = (b + centerpoint) / 2;
+			a = (b + centerPoint) / 2;
 			newVertices[0] = b;
 			newVertices[1] = midpoint;
 			newVertices[2] = a;
@@ -163,7 +185,7 @@ vector<Triangle*>* BezierPatchTesselator::tesselateTriangle(int mode, bool cente
 		}
 	} else {
 		// All sides are flat; this triangle is a good polygon
-		ret->push_back(new Triangle(p.evaluate(vertices[0]), p.evaluate(vertices[1]), p.evaluate(vertices[2])));
+		//ret->push_back(new Triangle(p.evaluate(vertices[0]), p.evaluate(vertices[1]), p.evaluate(vertices[2])));
 	}
 	return ret;
 }
