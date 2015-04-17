@@ -18,11 +18,11 @@ Vector3f rotation(0, 0, 0);
 void keyPressed(unsigned char key, int x, int y) {
   switch (key) {
     case '-': // Zoom out
-    camera[2] -= cameraMovement;
+    camera[2] += cameraMovement;
     break;
     case '=': // Zoom in
     case '+':
-    camera[2] += cameraMovement;
+    camera[2] -= cameraMovement;
     break;
     case 's': // Toggle smooth/flat shading
     flat = !flat;
@@ -63,16 +63,18 @@ void specialKeyPressed(int key, int x, int y) {
     break;
     case GLUT_KEY_LEFT:
     if (glutGetModifiers() && GLUT_ACTIVE_SHIFT > 0) { // Translate upwards
-      camera[0] -= cameraMovement;
+      camera[0] += cameraMovement;
     } else { // Rotate upwards
       rotation[1] -= rotateIncrement;
+      rotation[2] -= rotateIncrement;
     }
     break;
     case GLUT_KEY_RIGHT:
     if (glutGetModifiers() && GLUT_ACTIVE_SHIFT > 0) { // Translate upwards
-      camera[0] += cameraMovement;
+      camera[0] -= cameraMovement;
     } else { // Rotate upwards
       rotation[1] += rotateIncrement;
+      rotation[2] += rotateIncrement;
     }
     break;
   }
@@ -82,20 +84,36 @@ void specialKeyPressed(int key, int x, int y) {
 void display(void) {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+  glPushMatrix();
+  glTranslatef(camera[0], camera[1], camera[2]);
+  glRotatef(rotation[0], 1, 0, 0);
+  glRotatef(rotation[1], 0, 1, 0);
+  glRotatef(rotation[2], 0, 0, 1);
+
   glBegin(GL_TRIANGLES);
   for (int i = 0; i < triangles.size(); i++) {
-    Vector3f flatNormal = triangles[i]->getFlatNormal();
+    if (i == 0) {
+      GLfloat mat_diffuse[] = { 0.5, 0.0, 0.0, 1.0 };
+      glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
+    } else {
+      GLfloat mat_diffuse[] = { 0, 0, 0.5, 1.0 };
+      glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
+    }
     for (int j = 0; j < 3; j++) {
-      Vector3f v = triangles[i]->normals[j];
-      if (flat)
-        glNormal3f(flatNormal(0), flatNormal(1), flatNormal(2));
-      else
-        glNormal3f(v(0), v(1), v(2));
+      Vector3f v;
+      if (flat) {
+        v = triangles[i]->getFlatNormal();
+      } else {
+        v = triangles[i]->normals[j];
+      }
+      glNormal3f(v(0), v(1), v(2));
       v = triangles[i]->vertices[j];
       glVertex3f(v(0), v(1), v(2));
     }
   }
   glEnd();
+
+  glPopMatrix();
 
   glutSwapBuffers();
 }
@@ -137,10 +155,10 @@ void init(void) {
   glMatrixMode(GL_PROJECTION);
   gluPerspective(40.0, // FOV
     1.0, // Aspect ratio
-    boundingBox[2], // Near z
-    boundingBox[5]); // Far z
+    boundingBox[5], // Near z
+    boundingBox[2]); // Far z
   glMatrixMode(GL_MODELVIEW);
-  gluLookAt((boundingBox[0] + boundingBox[3]) / 2, (boundingBox[1] + boundingBox[4]) / 2, boundingBox[5] + 10,  // eye is at center of the x/y face of the bounding box, z + 10
+  gluLookAt((boundingBox[0] + boundingBox[3]) / 2, (boundingBox[1] + boundingBox[4]) / 2, boundingBox[2] - 10,  // eye is at center of the x/y face of the bounding box
     (boundingBox[0] + boundingBox[3]) / 2, (boundingBox[1] + boundingBox[4]) / 2, (boundingBox[2] + boundingBox[5]) / 2,      // center is at (0,0,0)
     0.0, 1.0, 0.0);      // up is in positive Y direction
 
@@ -172,6 +190,26 @@ int main(int argc, char* argv[]) {
   // Pass the patches to the tesselator
   // Store the Triangles; modify our boundingBox
   // TODO: Maybe move this stuff into another file?
+  triangles.push_back(new Triangle(
+    (Vector3f() <<  1, -1,  1).finished(),
+    (Vector3f() <<  1, -1, -1).finished(),
+    (Vector3f() << -1, -1, -1).finished(),
+    (Vector3f() << 0, 1, 0).finished(),
+    (Vector3f() << 0, 1, 0).finished(),
+    (Vector3f() << 0, 1, 0).finished()));
+  triangles.push_back(new Triangle(
+    (Vector3f() <<  1, 1,  1).finished(),
+    (Vector3f() <<  1, 1, -1).finished(),
+    (Vector3f() << -1, 1, -1).finished(),
+    (Vector3f() << 0, 1, 0).finished(),
+    (Vector3f() << 0, 1, 0).finished(),
+    (Vector3f() << 0, 1, 0).finished()));
+  boundingBox[0] = -1;
+  boundingBox[1] = -1;
+  boundingBox[2] = -1;
+  boundingBox[3] =  1;
+  boundingBox[4] =  1;
+  boundingBox[5] =  1;
   flat = wireframe = hidden_line = false;
   glutInit(&argc, argv);
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
