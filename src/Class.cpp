@@ -4,7 +4,7 @@
 #include <cstdio>
 
 void append(vector<Triangle*>* a, vector<Triangle*>* b) {
-	return a->insert(a->end(), b->begin(), b->end());
+	a->insert(a->end(), b->begin(), b->end());
 }
 
 BezierCurve::BezierCurve() {}
