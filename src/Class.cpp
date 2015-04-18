@@ -202,3 +202,6 @@ vector<Triangle*>* BezierPatchTesselator::tesselateTriangle(int mode, bool cente
 	}
 	return ret;
 }
+
+Vector3f BezierPatch::findNormal(Vector2f uv){
+}    
