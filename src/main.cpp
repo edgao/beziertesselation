@@ -204,19 +204,22 @@ int main(int argc, char* argv[]) {
     for (int i = 0; i < numPatches; i++) {
       BezierCurve curves[4];
       for (int j = 0; j < 4; j++) {
+        Vector3f points[4];
         getline(input_file, line);
         stringstream ss(line);
-        Vector3f points[4];
         for (int k = 0; k < 4; k++) {
           for (int l = 0; l < 3; l++) {
             string coord;
-            getline(ss, coord, ' ');
+            do {
+              getline(ss, coord, ' ');
+            } while (coord.length() == 0);
             points[k](l) = stof(coord);
           }
         }
         curves[j] = BezierCurve(points);
       }
       patches.push_back(new BezierPatch(curves));
+      getline(input_file, line);
     }
 
 
