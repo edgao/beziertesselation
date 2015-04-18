@@ -4,7 +4,12 @@
 #include <cstdio>
 
 void append(vector<Triangle*>* a, vector<Triangle*>* b) {
-	a->insert(a->end(), b->begin(), b->end());
+	for (int i = 0; i < a->size(); i++) {
+		a->push_back((*b)[i]);
+	}
+
+
+	// a->insert(a->end(), b->begin(), b->end());
 }
 
 BezierCurve::BezierCurve() {}
@@ -59,7 +64,7 @@ bool BezierPatchTesselator::isFlat(BezierPatch p, Vector2f u, Vector3f ref, floa
 	return (surf - ref).norm() < threshold;
 }
 vector<Triangle*>* BezierPatchTesselator::tesselate(int mode, bool center_test, float threshold) {
-	vector<Triangle*>* triangles = (vector<Triangle*>*) malloc(sizeof(vector<Triangle*>));
+	vector<Triangle*>* triangles = new vector<Triangle*>();
 	for (int patchNum = 0; patchNum < patches.size(); patchNum++) {
 		Vector2f vertices[3];
 		vertices[0] = (Vector2f() << 0, 0).finished();
@@ -80,12 +85,12 @@ vector<Triangle*>* BezierPatchTesselator::tesselate(int mode, bool center_test, 
 vector<Triangle*>* BezierPatchTesselator::tesselateTriangle(int mode, bool center_test, Vector2f vertices[], BezierPatch p, float threshold) {
 	// If this triangle is too small, return
 	if ((vertices[0] - vertices[1]).norm() < 0.01) {
-		vector<Triangle*>* ret = (vector<Triangle*>*) malloc(sizeof(vector<Triangle*>));
+		vector<Triangle*>* ret = new vector<Triangle*>();
 		Vector3f norm = p.evaluate(vertices[0]).cross(p.evaluate(vertices[1]));
 		ret->push_back(new Triangle(p.evaluate(vertices[0]), p.evaluate(vertices[1]), p.evaluate(vertices[2]), norm, norm, norm));
-		return   ret;
+		return ret;
 	}
-	vector<Triangle*>* ret = (vector<Triangle*>*) malloc(sizeof(vector<Triangle*>));
+	vector<Triangle*>* ret = new vector<Triangle*>();
 	if (center_test) {
 		Vector2f centerPoint = (vertices[0] + vertices[1] + vertices[2]) / 3;
 		bool center_flat = isFlat(p, centerPoint, p.evaluate(centerPoint), threshold);

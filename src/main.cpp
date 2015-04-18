@@ -166,6 +166,7 @@ void init(void) {
 }
 
 int main(int argc, char* argv[]) {
+  glutInit(&argc, argv);
   if (argc < 3) {
     cout << "Usage: as3 file.bez threshold [-a]" << endl;
   }
@@ -217,45 +218,31 @@ int main(int argc, char* argv[]) {
   // Pass the patches to the tesselator
   BezierPatchTesselator tesselator(&patches);
   triangles = *tesselator.tesselate(adaptive ? BezierPatchTesselator::ADAPTIVE_MODE : BezierPatchTesselator::UNIFORM_MODE, false, threshold);
-  for (int i = 0; i < triangles.size(); i++) {
-    Vector3f vertices[3] = triangles[i]->vertices;
-    for (int j = 0; j < 3; j++) {
-      for (int k = 0; k < 3; k++) {
-        if (vertices[j](k) < boundingBox[j]) {
-          boundingBox[j] = vertices[j](k);
-        }
-        if (vertices[j](k) > boundingBox[j + 3]) {
-          boundingBox[j + 3] = vertices[j](k);
-        }
-      }
-    }
-  }
-  for (int i = 0; i < 3; i++) {
-    boundingBox[i] -= 1;
-    boundingBox[i + 3] += 1;
-  }
-  // triangles.push_back(new Triangle(
-  //   (Vector3f() <<  1, -1,  1).finished(),
-  //   (Vector3f() <<  1, -1, -1).finished(),
-  //   (Vector3f() << -1, -1, -1).finished(),
-  //   (Vector3f() << 0, 1, 0).finished(),
-  //   (Vector3f() << 0, 1, 0).finished(),
-  //   (Vector3f() << 0, 1, 0).finished()));
-  // triangles.push_back(new Triangle(
-  //   (Vector3f() <<  1, 1,  1).finished(),
-  //   (Vector3f() <<  1, 1, -1).finished(),
-  //   (Vector3f() << -1, 1, -1).finished(),
-  //   (Vector3f() << 0, 1, 0).finished(),
-  //   (Vector3f() << 0, 1, 0).finished(),
-  //   (Vector3f() << 0, 1, 0).finished()));
-  // boundingBox[0] = -1;
-  // boundingBox[1] = -1;
-  // boundingBox[2] = -1;
-  // boundingBox[3] =  1;
-  // boundingBox[4] =  1;
-  // boundingBox[5] =  1;
+  cout << "SIZE " << triangles.size() << endl;
+  // for (int i = 0; i < triangles.size(); i++) {
+  //   Vector3f vertices[3] = triangles[i]->vertices;
+  //   for (int j = 0; j < 3; j++) {
+  //     for (int k = 0; k < 3; k++) {
+  //       if (vertices[j](k) < boundingBox[j]) {
+  //         boundingBox[j] = vertices[j](k);
+  //       }
+  //       if (vertices[j](k) > boundingBox[j + 3]) {
+  //         boundingBox[j + 3] = vertices[j](k);
+  //       }
+  //     }
+  //   }
+  // }
+  // for (int i = 0; i < 3; i++) {
+  //   boundingBox[i] -= 1;
+  //   boundingBox[i + 3] += 1;
+  // }
+  boundingBox[0] = -1;
+  boundingBox[1] = -1;
+  boundingBox[2] = -1;
+  boundingBox[3] =  1;
+  boundingBox[4] =  1;
+  boundingBox[5] =  1;
   flat = wireframe = hidden_line = false;
-  glutInit(&argc, argv);
   glutCreateWindow("Bezier surface tesselation");
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
   glutDisplayFunc(display);
