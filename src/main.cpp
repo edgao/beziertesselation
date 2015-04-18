@@ -11,9 +11,9 @@ vector<Triangle*> triangles;
 bool flat, wireframe, hidden_line;
 // min(x, y, z) to max(x, y, z)
 float boundingBox[6];
-float cameraMovement = 0.05;
+float cameraMovement = 0.1;
 Vector3f camera(0, 0, 0);
-float rotateIncrement = 1;
+float rotateIncrement = 2;
 Vector3f rotation(0, 0, 0);
 
 void keyPressed(unsigned char key, int x, int y) {
@@ -93,13 +93,6 @@ void display(void) {
 
   glBegin(GL_TRIANGLES);
   for (int i = 0; i < triangles.size(); i++) {
-    if (i == 0) {
-      GLfloat mat_diffuse[] = { 0.5, 0.0, 0.0, 1.0 };
-      glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
-    } else {
-      GLfloat mat_diffuse[] = { 0, 0, 0.5, 1.0 };
-      glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
-    }
     for (int j = 0; j < 3; j++) {
       Vector3f v;
       if (flat) {
@@ -219,11 +212,6 @@ int main(int argc, char* argv[]) {
   BezierPatchTesselator tesselator(&patches);
   triangles = *tesselator.tesselate(adaptive ? BezierPatchTesselator::ADAPTIVE_MODE : BezierPatchTesselator::UNIFORM_MODE, false, threshold);
   cout << "SIZE " << triangles.size() << endl;
-  for (int i = 0; i < triangles.size(); i++) {
-    for (int j = 0; j < 3; j++) {
-      cout << "TRIANGLE " << i << " VERTEX " << j << endl << triangles[i]->vertices[j] << endl;
-    }
-  }
   // for (int i = 0; i < triangles.size(); i++) {
   //   Vector3f vertices[3] = triangles[i]->vertices;
   //   for (int j = 0; j < 3; j++) {
