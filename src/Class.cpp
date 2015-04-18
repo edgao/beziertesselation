@@ -192,7 +192,8 @@ vector<Triangle*>* BezierPatchTesselator::tesselateTriangle(int mode, bool cente
 		}
 	} else {
 		// All sides are flat; this triangle is a good polygon
-		//ret->push_back(new Triangle(p.evaluate(vertices[0]), p.evaluate(vertices[1]), p.evaluate(vertices[2])));
+		Vector3f norm = p.evaluate(vertices[2]).cross(p.evaluate(vertices[1]));
+		ret->push_back(new Triangle(p.evaluate(vertices[0]), p.evaluate(vertices[1]), p.evaluate(vertices[2]), norm, norm, norm));
 	}
 	return ret;
 }

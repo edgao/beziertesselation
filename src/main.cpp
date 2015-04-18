@@ -256,8 +256,8 @@ int main(int argc, char* argv[]) {
   // boundingBox[5] =  1;
   flat = wireframe = hidden_line = false;
   glutInit(&argc, argv);
-  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
   glutCreateWindow("Bezier surface tesselation");
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
   glutDisplayFunc(display);
   glutKeyboardFunc(keyPressed);
   glutSpecialFunc(specialKeyPressed);
