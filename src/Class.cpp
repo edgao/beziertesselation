@@ -64,16 +64,27 @@ vector<Triangle*>* BezierPatchTesselator::tesselate(int mode, bool center_test, 
 		vector<Triangle*>* triangles = new vector<Triangle*>();
 
 		for (int patchNum = 0; patchNum < patches.size(); patchNum++) {
-			BezierPatch p = patches[patchNum];
+			BezierPatch p = *patches[patchNum];
 			float u = 0;
 			while (u < 1 - threshold) {
 				float v = 0;
 				while (v < 1 - threshold) {
+					Vector2f a, b, c;
+					a = (Vector2f() << u, v).finished();
+					b = (Vector2f() << u + threshold, v).finished();
+					c = (Vector2f() << u, v + threshold).finished();
+					triangles->push_back(new Triangle(p.evaluate(a), p.evaluate(b), p.evaluate(c), p.findNormal(a), p.findNormal(b), p.findNormal(c)));
+
+					a = (Vector2f() << u + threshold, v + threshold).finished();
+					b = (Vector2f() << u + threshold, v).finished();
+					c = (Vector2f() << u, v + threshold).finished();
+					triangles->push_back(new Triangle(p.evaluate(a), p.evaluate(b), p.evaluate(c), p.findNormal(a), p.findNormal(b), p.findNormal(c)));
 					v += threshold;
 				}
 				u += threshold;
 			}
 		}
+		return triangles;
 	}
 
 	vector<Triangle*>* triangles = new vector<Triangle*>();

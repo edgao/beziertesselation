@@ -150,17 +150,17 @@ void init(void) {
   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
   glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, 64);
 
-  glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+  glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse0);
   glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
   glLightfv(GL_LIGHT0, GL_POSITION, light0_position);
   glEnable(GL_LIGHT0);
 
-  glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse);
+  glLightfv(GL_LIGHT1, GL_DIFFUSE, light_diffuse1);
   glLightfv(GL_LIGHT1, GL_SPECULAR, light_specular);
   glLightfv(GL_LIGHT1, GL_POSITION, light1_position);
   glEnable(GL_LIGHT1);
 
-  glLightfv(GL_LIGHT2, GL_DIFFUSE, light_diffuse);
+  glLightfv(GL_LIGHT2, GL_DIFFUSE, light_diffuse2);
   glLightfv(GL_LIGHT2, GL_SPECULAR, light_specular);
   glLightfv(GL_LIGHT2, GL_POSITION, light2_position);
   glEnable(GL_LIGHT2);
