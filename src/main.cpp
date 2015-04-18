@@ -135,16 +135,16 @@ void display(void) {
 }
 
 void init(void) {
-  GLfloat light_diffuse0[]   = {1.0, 1.0, 1.0, 1.0};
-  GLfloat light_diffuse1[]   = {1.0, 1.0, 1.0, 1.0};
-  GLfloat light_diffuse2[]   = {1.0, 1.0, 1.0, 1.0};
-  GLfloat light_specular[]  = {1.0, 1.0, 1.0, 1.0};
+  GLfloat light_diffuse0[] = {0.3, 0.3, 0.3, 1.0};
+  GLfloat light_diffuse1[] = {0.3, 0.3, 0.3, 1.0};
+  GLfloat light_diffuse2[] = {0.3, 0.3, 0.3, 1.0};
+  GLfloat light_specular[] = {1.0, 1.0, 1.0, 1.0};
   // Put three directional lights in
   GLfloat light0_position[] = { 1.0,  1.0,  1.0, 0.0};
   GLfloat light1_position[] = {-1.0, -1.0,  1.0, 0.0};
   GLfloat light2_position[] = { 0.0,  0.0, -1.0, 0.0};
 
-  GLfloat mat_diffuse[] = { 0.3, 0.3, 0.3, 1.0 };
+  GLfloat mat_diffuse[] = { 1, 1, 1, 1.0 };
   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
   GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
@@ -189,7 +189,7 @@ int main(int argc, char* argv[]) {
   }
   float threshold = atof(argv[2]);
   bool adaptive = false;
-  if (argc < 4 || strcmp("-a", argv[3]) == 0) {
+  if (argc == 4 && strcmp("-a", argv[3]) == 0) {
     adaptive = true;
   }
   fstream input_file (argv[1]);
@@ -203,30 +203,49 @@ int main(int argc, char* argv[]) {
     numPatches = atoi(line.c_str());
     for (int i = 0; i < numPatches; i++) {
       BezierCurve curves[4];
-      // Read in the 4 curves
       for (int j = 0; j < 4; j++) {
-        Vector3f points[4];
-        // Read in the 4 control points
-        do {
-          getline(input_file, line);
-        } while (line[0] == '\r');
+        getline(input_file, line);
         stringstream ss(line);
+        Vector3f points[4];
         for (int k = 0; k < 4; k++) {
-          // Read in the 3 coordinates
-          float coords[3];
           for (int l = 0; l < 3; l++) {
             string coord;
-            do {
-              getline(ss, coord, ' ');
-            } while (coord.length() == 0);
-            coords[l] = stof(coord);
+            getline(ss, coord, ' ');
+            points[k](l) = stof(coord);
           }
-          points[k] = (Vector3f() << coords[0], coords[1], coords[2]).finished();
         }
         curves[j] = BezierCurve(points);
       }
       patches.push_back(new BezierPatch(curves));
     }
+
+
+    // for (int i = 0; i < numPatches; i++) {
+    //   BezierCurve curves[4];
+    //   // Read in the 4 curves
+    //   for (int j = 0; j < 4; j++) {
+    //     Vector3f points[4];
+    //     // Read in the 4 control points
+    //     do {
+    //       getline(input_file, line);
+    //     } while (line[0] == '\r');
+    //     stringstream ss(line);
+    //     for (int k = 0; k < 4; k++) {
+    //       // Read in the 3 coordinates
+    //       float coords[3];
+    //       for (int l = 0; l < 3; l++) {
+    //         string coord;
+    //         do {
+    //           getline(ss, coord, ' ');
+    //         } while (coord.length() == 0);
+    //         coords[l] = stof(coord);
+    //       }
+    //       points[k] = (Vector3f() << coords[0], coords[1], coords[2]).finished();
+    //     }
+    //     curves[j] = BezierCurve(points);
+    //   }
+    //   patches.push_back(new BezierPatch(curves));
+    // }
     input_file.close();
   } else{
     cout << "Unable to open file" << endl;
@@ -234,6 +253,7 @@ int main(int argc, char* argv[]) {
   }
   // Pass the patches to the tesselator
   BezierPatchTesselator tesselator(&patches);
+  cout << adaptive << endl;
   triangles = *tesselator.tesselate(adaptive ? BezierPatchTesselator::ADAPTIVE_MODE : BezierPatchTesselator::UNIFORM_MODE, false, threshold);
   cout << "SIZE " << triangles.size() << endl;
   // for (int i = 0; i < triangles.size(); i++) {
