@@ -78,6 +78,13 @@ vector<Triangle*>* BezierPatchTesselator::tesselate(int mode, bool center_test, 
 }
 
 vector<Triangle*>* BezierPatchTesselator::tesselateTriangle(int mode, bool center_test, Vector2f vertices[], BezierPatch p, float threshold) {
+	// If this triangle is too small, return
+	if ((vertices[0] - vertices[1]).norm() < 0.01) {
+		vector<Triangle*>* ret = (vector<Triangle*>*) malloc(sizeof(vector<Triangle*>));
+		Vector3f norm = p.evaluate(vertices[0]).cross(p.evaluate(vertices[1]));
+		ret->push_back(new Triangle(p.evaluate(vertices[0]), p.evaluate(vertices[1]), p.evaluate(vertices[2]), norm, norm, norm));
+		return   ret;
+	}
 	vector<Triangle*>* ret = (vector<Triangle*>*) malloc(sizeof(vector<Triangle*>));
 	if (center_test) {
 		Vector2f centerPoint = (vertices[0] + vertices[1] + vertices[2]) / 3;
@@ -117,13 +124,13 @@ vector<Triangle*>* BezierPatchTesselator::tesselateTriangle(int mode, bool cente
 		Vector2f a = vertices[side], b = vertices[(side + 1) % 3];
 		Vector2f midpoint = (a + b) / 2;
 		Vector3f ref = p.evaluate(midpoint);
-		nonflat[side] = isFlat(p, midpoint, ref, threshold);
+		nonflat[side] = !isFlat(p, midpoint, ref, threshold);
 		if (nonflat[side]) {
 			sides[num] = side;
 			num++;
 		}
 	}
-	if (nonflat[2]) {
+	if (num == 3) {
 		// All sides are nonflat, subdivide into 4 triangles
 		// Handle the three corners
 		for (int side = 0; side < 3; side++) {
@@ -139,8 +146,8 @@ vector<Triangle*>* BezierPatchTesselator::tesselateTriangle(int mode, bool cente
 			newVertices[side] = (vertices[side] + vertices[(side + 1) % 3]) / 2;
 		}
 		append(ret, tesselateTriangle(mode, center_test, newVertices, p, threshold));
-	} else if (nonflat[0]) {
-		if (nonflat[1]) {
+	} else if (num >= 1) {
+		if (num == 2) {
 			// One side is flat; 3 sub-triangles 
 			Vector2f a, b, centerPoint, midpoint;
 			a = vertices[sides[0]];

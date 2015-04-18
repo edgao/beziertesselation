@@ -216,7 +216,7 @@ int main(int argc, char* argv[]) {
   }
   // Pass the patches to the tesselator
   BezierPatchTesselator tesselator(&patches);
-  triangles = *tesselator.tesselate(adaptive ? BezierPatchTesselator::ADAPTIVE_MODE : BezierPatchTesselator::UNIFORM_MODE, true, threshold);
+  triangles = *tesselator.tesselate(adaptive ? BezierPatchTesselator::ADAPTIVE_MODE : BezierPatchTesselator::UNIFORM_MODE, false, threshold);
   for (int i = 0; i < triangles.size(); i++) {
     Vector3f vertices[3] = triangles[i]->vertices;
     for (int j = 0; j < 3; j++) {
