@@ -18,6 +18,7 @@ public:
 	BezierPatch();
 	BezierPatch(BezierCurve[]);
 	Vector3f evaluate(Vector2f);
+    Vector3f findNormal(Vector2f);
 };
 
 class Triangle {

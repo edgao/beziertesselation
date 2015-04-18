@@ -216,4 +216,46 @@ vector<Triangle*>* BezierPatchTesselator::tesselateTriangle(int mode, bool cente
 }
 
 Vector3f BezierPatch::findNormal(Vector2f uv){
+  // returns a normal vector to the point
+  Vector3f ret;
+  float u = uv(0);
+  float v = uv(1);
+  for (int i=0; i<4; i++){
+    for (int j=0; j<4; j++){
+      if (i == 0 and j == 0){
+        ret += pow(1 - u, 3) * pow(1 - v, 3) * this->evaluate(uv);
+      }else if (i == 0 and j == 1){
+        ret += pow(1 - u, 3) * 3*v*pow(1-v, 2) * this->evaluate(uv);
+      }else if (i == 0 and j == 2){
+        ret += pow(1 - u, 3) * 3*pow(v, 2)*(1-v) * this->evaluate(uv);
+      }else if (i == 0 and j == 3){
+        ret += pow(1 - u, 3) * pow(v, 3) * this->evaluate(uv);
+      }else if (i == 1 and j == 0){
+        ret += 3*u*pow(1 - u, 2) * pow(1 - v, 3) * this->evaluate(uv);
+      }else if (i == 1 and j == 1){
+        ret += 3*u*pow(1 - u, 2) * 3*v*pow(1-v, 2) * this->evaluate(uv);
+      }else if (i == 1 and j == 2){
+        ret += 3*u*pow(1 - u, 2) * 3*pow(v, 2)*(1-v) * this->evaluate(uv);
+      }else if (i == 1 and j == 3){
+        ret += 3*u*pow(1 - u, 2) * pow(v, 3) * this->evaluate(uv);
+      }else if (i == 2 and j == 0){
+        ret += 3*pow(u,2)*(1 - u) * pow(1 - v, 3) * this->evaluate(uv);
+      }else if (i == 2 and j == 1){
+        ret += 3*pow(u,2)*(1 - u) * 3*v*pow(1-v, 2) * this->evaluate(uv);
+      }else if (i == 2 and j == 2){
+        ret += 3*pow(u,2)*(1 - u) * 3*pow(v, 2)*(1-v) * this->evaluate(uv);
+      }else if (i == 2 and j == 3){
+        ret += 3*pow(u,2)*(1 - u) * pow(v, 3) * this->evaluate(uv);
+      }else if (i == 3 and j == 0){
+        ret += pow(u, 3) * pow(1 - v, 3) * this->evaluate(uv);
+      }else if (i == 3 and j == 1){
+        ret += pow(u, 3) * 3*v*pow(1-v, 2) * this->evaluate(uv);
+      }else if (i == 3 and j == 2){
+        ret += pow(u, 3) * 3*pow(v, 2)*(1-v) * this->evaluate(uv);
+      }else if (i == 3 and j == 3){
+        ret += pow(u, 3) * pow(v, 3) * this->evaluate(uv);
+      }
+    }
+  }
+  return ret;
 }    
