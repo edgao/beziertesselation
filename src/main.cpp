@@ -42,6 +42,7 @@ void keyPressed(unsigned char key, int x, int y) {
     }
     break;
     case 'h': // Toggle filled/hidden-line mode
+    hidden_line = !hidden_line;
     break;
   }
   glutPostRedisplay();
@@ -91,6 +92,12 @@ void display(void) {
   glRotatef(rotation[1], 0, 1, 0);
   glRotatef(rotation[2], 0, 0, 1);
 
+  if (wireframe) {
+    glDisable(GL_LIGHTING);
+  } else {
+    glEnable(GL_LIGHTING);
+  }
+
   glBegin(GL_TRIANGLES);
   for (int i = 0; i < triangles.size(); i++) {
     for (int j = 0; j < 3; j++) {
@@ -103,6 +110,21 @@ void display(void) {
       glNormal3f(v(0), v(1), v(2));
       v = triangles[i]->vertices[j];
       glVertex3f(v(0), v(1), v(2));
+
+      if (wireframe && hidden_line) {
+        // deep magic
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glEnable(GL_POLYGON_OFFSET_FILL);
+        glPolygonOffset(0.5, 1.0);
+        glColor3f(1, 0, 0);
+        glNormal3f(v(0), v(1), v(2));
+        v = triangles[i]->vertices[j];
+        glVertex3f(v(0), v(1), v(2));
+        glColor3f(1, 1, 1);
+        glPolygonOffset(0.0, 0.0);
+        glDisable(GL_POLYGON_OFFSET_FILL);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+      }
     }
   }
   glEnd();
@@ -113,14 +135,16 @@ void display(void) {
 }
 
 void init(void) {
-  GLfloat light_diffuse[]   = {1.0, 1.0, 1.0, 1.0};
+  GLfloat light_diffuse0[]   = {1.0, 1.0, 1.0, 1.0};
+  GLfloat light_diffuse1[]   = {1.0, 1.0, 1.0, 1.0};
+  GLfloat light_diffuse2[]   = {1.0, 1.0, 1.0, 1.0};
   GLfloat light_specular[]  = {1.0, 1.0, 1.0, 1.0};
   // Put three directional lights in
   GLfloat light0_position[] = { 1.0,  1.0,  1.0, 0.0};
   GLfloat light1_position[] = {-1.0, -1.0,  1.0, 0.0};
   GLfloat light2_position[] = { 0.0,  0.0, -1.0, 0.0};
 
-  GLfloat mat_diffuse[] = { 0.5, 0.5, 0.5, 1.0 };
+  GLfloat mat_diffuse[] = { 0.3, 0.3, 0.3, 1.0 };
   glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
   GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
   glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
@@ -236,6 +260,7 @@ int main(int argc, char* argv[]) {
   boundingBox[4] =  1;
   boundingBox[5] =  1;
   flat = wireframe = hidden_line = false;
+  glutInitWindowSize(500, 500);
   glutCreateWindow("Bezier surface tesselation");
   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
   glutDisplayFunc(display);

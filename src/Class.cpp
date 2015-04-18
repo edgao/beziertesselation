@@ -60,6 +60,22 @@ bool BezierPatchTesselator::isFlat(BezierPatch p, Vector3f u, Vector3f ref, floa
 	return (u - ref).norm() < threshold;
 }
 vector<Triangle*>* BezierPatchTesselator::tesselate(int mode, bool center_test, float threshold) {
+	if (mode == UNIFORM_MODE) {
+		vector<Triangle*>* triangles = new vector<Triangle*>();
+
+		for (int patchNum = 0; patchNum < patches.size(); patchNum++) {
+			BezierPatch p = patches[patchNum];
+			float u = 0;
+			while (u < 1 - threshold) {
+				float v = 0;
+				while (v < 1 - threshold) {
+					v += threshold;
+				}
+				u += threshold;
+			}
+		}
+	}
+
 	vector<Triangle*>* triangles = new vector<Triangle*>();
 	for (int patchNum = 0; patchNum < patches.size(); patchNum++) {
 		Vector2f vertices[3];
@@ -83,7 +99,7 @@ vector<Triangle*>* BezierPatchTesselator::tesselateTriangle(int mode, bool cente
 	if ((vertices[0] - vertices[1]).norm() < threshold) {
 		vector<Triangle*>* ret = new vector<Triangle*>();
 		Vector3f norm = p.evaluate(vertices[0]).cross(p.evaluate(vertices[1])).normalized();
-		ret->push_back(new Triangle(p.evaluate(vertices[0]), p.evaluate(vertices[1]), p.evaluate(vertices[2]), norm, norm, norm));
+		ret->push_back(new Triangle(p.evaluate(vertices[0]), p.evaluate(vertices[1]), p.evaluate(vertices[2]), p.findNormal(vertices[0]), p.findNormal(vertices[1]), p.findNormal(vertices[2])));
 		return ret;
 	}
 	vector<Triangle*>* ret = new vector<Triangle*>();
@@ -99,7 +115,7 @@ vector<Triangle*>* BezierPatchTesselator::tesselateTriangle(int mode, bool cente
 				if (isFlat(p, (p.evaluate(a) + p.evaluate(b)) / 2, ref, threshold)) {
 					// If this side of the triangle is flat, make it a polygon
 					Vector3f norm = p.evaluate(a).cross(p.evaluate(b));
-					ret->push_back(new Triangle(p.evaluate(a), p.evaluate(b), p.evaluate(centerPoint), norm, norm, norm));
+					ret->push_back(new Triangle(p.evaluate(a), p.evaluate(b), p.evaluate(centerPoint), p.findNormal(a), p.findNormal(b), p.findNormal(centerPoint)));
 				} else {
 					// Otherwise, subdivide and recurse
 					Vector2f newVertices[3];
@@ -210,7 +226,7 @@ vector<Triangle*>* BezierPatchTesselator::tesselateTriangle(int mode, bool cente
 	} else {
 		// All sides are flat; this triangle is a good polygon
 		Vector3f norm = p.evaluate(vertices[2]).cross(p.evaluate(vertices[1])).normalized();
-		ret->push_back(new Triangle(p.evaluate(vertices[0]), p.evaluate(vertices[1]), p.evaluate(vertices[2]), norm, norm, norm));
+		ret->push_back(new Triangle(p.evaluate(vertices[0]), p.evaluate(vertices[1]), p.evaluate(vertices[2]), p.findNormal(vertices[0]), p.findNormal(vertices[1]), p.findNormal(vertices[2])));
 	}
 	return ret;
 }
