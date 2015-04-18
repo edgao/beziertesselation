@@ -219,6 +219,11 @@ int main(int argc, char* argv[]) {
   BezierPatchTesselator tesselator(&patches);
   triangles = *tesselator.tesselate(adaptive ? BezierPatchTesselator::ADAPTIVE_MODE : BezierPatchTesselator::UNIFORM_MODE, false, threshold);
   cout << "SIZE " << triangles.size() << endl;
+  for (int i = 0; i < triangles.size(); i++) {
+    for (int j = 0; j < 3; j++) {
+      cout << "TRIANGLE " << i << " VERTEX " << j << endl << triangles[i]->vertices[j] << endl;
+    }
+  }
   // for (int i = 0; i < triangles.size(); i++) {
   //   Vector3f vertices[3] = triangles[i]->vertices;
   //   for (int j = 0; j < 3; j++) {

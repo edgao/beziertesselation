@@ -38,5 +38,5 @@ public:
 	BezierPatchTesselator(vector<BezierPatch*>*);
 	vector<Triangle*>* tesselate(int mode, bool center_test, float threshold);
 	vector<Triangle*>* tesselateTriangle(int mode, bool center_test, Vector2f vertices[], BezierPatch p, float threshold);
-	bool isFlat(BezierPatch, Vector2f, Vector3f, float);
+	bool isFlat(BezierPatch, Vector3f, Vector3f, float);
 };
